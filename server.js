@@ -15,7 +15,6 @@ app.use(bodyParser());
 router.post('/reply', async ctx => {
     const userMessage = ctx.request.body.message;
 
-    // 检查消息中是否包含特定字符串
     if (userMessage.includes("form")) {
         const formHtml = `
             <form id="special-form" action="/submit-form">
@@ -24,7 +23,7 @@ router.post('/reply', async ctx => {
                 <label for="email">邮箱:</label>
                 <input type="text" id="email" name="email"><br><br>
                 <input type="submit" value="提交">
-                <button type="button" id="cancel-btn">取消</button>
+                <button type="button" class="cancel-btn">取消</button>
             </form>
         `;
         ctx.body = { html: formHtml };
