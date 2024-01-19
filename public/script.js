@@ -46,10 +46,40 @@ function displayMessage(message, sender) {
     messageElement.textContent = message;
     chatBox.appendChild(messageElement);
 }
-
 function displayHtml(htmlContent) {
     var chatBox = document.getElementById('chat-box');
     var htmlContainer = document.createElement('div');
     htmlContainer.innerHTML = htmlContent;
     chatBox.appendChild(htmlContainer);
+
+    // 检查是否存在特殊表单
+    var form = document.getElementById('special-form');
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // 阻止表单默认提交
+
+            // 获取表单数据并发送
+            var formData = new FormData(form);
+            fetch('/submit-form', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                // 处理响应
+
+                // 隐藏提交和取消按钮
+                form.querySelector('input[type="submit"]').style.display = 'none';
+                document.getElementById('cancel-btn').style.display = 'none';
+
+                // 可以在这里添加其他成功提交后的操作
+            }).catch(error => {
+                // 处理错误
+            });
+        });
+
+        // 取消按钮的事件监听器
+        document.getElementById('cancel-btn').addEventListener('click', function() {
+            form.querySelector('input[type="submit"]').style.display = 'none';
+            this.style.display = 'none';
+        });
+    }
 }
