@@ -1,0 +1,31 @@
+project:
+  base_path: ./
+  ignore:
+    path:
+      - target
+      - .idea
+      - .mvn
+      - prompt
+      - prompt-builder
+      - node_modules
+      - ai_helper
+      - spike
+      - doc
+      - .git
+      - config.yml
+      - package-lock.json
+    file:
+      - .DS_Store
+input:
+  prompt_template:
+    path: ai_helper/prompt_builder/prompt    
+  relative_files:
+    template: >
+      ```yaml
+
+      {{{content}}}
+
+      ```
+output:     
+  prompt:
+    path: ai_helper/prompt_builder/output/
