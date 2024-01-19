@@ -1,4 +1,14 @@
-document.getElementById('send-btn').addEventListener('click', function() {
+document.getElementById('send-btn').addEventListener('click', sendMessage);
+document.getElementById('user-input').addEventListener('keydown', function(event) {
+    // 当用户按下回车键且没有按住Shift键时发送消息
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault(); // 防止默认的换行行为
+        sendMessage();
+    }
+});
+
+
+function sendMessage() {
     var userInput = document.getElementById('user-input').value;
     if (userInput) {
         // 显示用户输入
@@ -26,7 +36,8 @@ document.getElementById('send-btn').addEventListener('click', function() {
         // 清空输入框
         document.getElementById('user-input').value = '';
     }
-});
+}
+
 
 function displayMessage(message, sender) {
     var chatBox = document.getElementById('chat-box');
