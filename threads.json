@@ -1,0 +1,38 @@
+[
+  {
+    "id": "thread_mj2qv6zxp",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "sss"
+      },
+      {
+        "sender": "bot",
+        "text": "回复: sss"
+      },
+      {
+        "sender": "user",
+        "text": "form"
+      },
+      {
+        "sender": "bot",
+        "text": "\n            <form id=\"special-form\" action=\"/submit-form\">\n                <label for=\"name\">姓名:</label>\n                <input type=\"text\" id=\"name\" name=\"name\"><br><br>\n                <label for=\"email\">邮箱:</label>\n                <input type=\"text\" id=\"email\" name=\"email\"><br><br>\n                <input type=\"submit\" value=\"提交\">\n                <button type=\"button\" class=\"cancel-btn\">取消</button>\n            </form>\n        ",
+        "isHtml": true
+      }
+    ]
+  },
+  {
+    "id": "thread_5szcjszgz",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "form"
+      },
+      {
+        "sender": "bot",
+        "text": "\n            <form id=\"special-form\" action=\"/submit-form\">\n                <label for=\"name\">姓名:</label>\n                <input type=\"text\" id=\"name\" name=\"name\"><br><br>\n                <label for=\"email\">邮箱:</label>\n                <input type=\"text\" id=\"email\" name=\"email\"><br><br>\n                <input type=\"submit\" value=\"提交\">\n                <button type=\"button\" class=\"cancel-btn\">取消</button>\n            </form>\n        ",
+        "isHtml": true
+      }
+    ]
+  }
+]

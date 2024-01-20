@@ -1,5 +1,5 @@
 document.getElementById('send-btn').addEventListener('click', sendMessage);
-document.getElementById('user-input').addEventListener('keydown', function(event) {
+document.getElementById('user-input').addEventListener('keydown', function (event) {
     // 当用户按下回车键且没有按住Shift键时发送消息
     if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault(); // 防止默认的换行行为
@@ -15,29 +15,48 @@ function createThread() {
         .then(data => {
             if (data.threadId) {
                 window.threadId = data.threadId;
-                loadThreads();
+                loadThreads();  // 加载新的线程列表
+                // 更新 URL
+                window.history.pushState({ threadId: data.threadId }, '', `?threadId=${data.threadId}`);
             }
         });
 }
 
-window.onload = function() {
+
+window.onload = function () {
     loadThreads();
+
     // 其他已有的初始化代码
+    const urlParams = new URLSearchParams(window.location.search);
+    const threadIdFromUrl = urlParams.get('threadId');
+    loadThreads();
+
+    if (threadIdFromUrl) {
+        window.threadId = threadIdFromUrl;
+        loadMessages(threadIdFromUrl);
+    }
 };
 
 
 function loadThreads() {
-    fetch('/threads')
+    fetch('/threads', {
+        headers: {
+            'Cache-Control': 'no-cache',  // 禁止缓存
+            'Pragma': 'no-cache'
+        }
+    })
         .then(response => response.json())
         .then(threads => {
             const threadList = document.getElementById('thread-list');
-            threadList.innerHTML = '';
+            threadList.innerHTML = ''; // 清空现有的线程列表
             threads.forEach(thread => {
                 const li = document.createElement('li');
-                li.textContent = `Thread ${thread.id} (${thread.messageCount} messages)`;
-                li.onclick = function() { 
+                li.textContent = `${thread.id} ： (${thread.messageCount} messages)`;
+                li.onclick = function () {
                     window.threadId = thread.id;
-                    loadMessages(thread.id); 
+                    loadMessages(thread.id);
+                    // 更新 URL
+                    window.history.pushState({ threadId: thread.id }, '', `?threadId=${thread.id}`);
                 };
                 threadList.appendChild(li);
             });
@@ -78,16 +97,16 @@ function sendMessage() {
             },
             body: JSON.stringify({ message: userInput, threadId: threadId })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.html) {
-                // 如果响应包含HTML，直接将其显示在聊天框中
-                displayHtml(data.html);
-            } else {
-                // 否则，显示文本消息
-                displayMessage(data.reply, 'bot');
-            }
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.html) {
+                    // 如果响应包含HTML，直接将其显示在聊天框中
+                    displayHtml(data.html);
+                } else {
+                    // 否则，显示文本消息
+                    displayMessage(data.reply, 'bot');
+                }
+            });
 
         // 清空输入框
         document.getElementById('user-input').value = '';
@@ -115,7 +134,7 @@ function displayHtml(htmlContent) {
 }
 
 function setupForm(form) {
-    form.addEventListener('submit', function(event) {
+    form.addEventListener('submit', function (event) {
         event.preventDefault(); // 阻止表单默认提交
         var actionUrl = form.getAttribute('action'); // 获取表单的提交地址
 
@@ -141,7 +160,7 @@ function setupForm(form) {
     });
 
     // 为取消按钮绑定事件
-    form.querySelector('.cancel-btn').addEventListener('click', function() {
+    form.querySelector('.cancel-btn').addEventListener('click', function () {
         form.querySelector('input[type="submit"]').style.display = 'none';
         this.style.display = 'none';
     });

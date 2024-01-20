@@ -3,18 +3,46 @@ const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const serve = require('koa-static');
 const path = require('path');
+const fs = require('fs').promises;  // 异步文件操作
 
 const app = new Koa();
 const router = new Router();
+
+const THREADS_FILE = path.join(__dirname, 'threads.json');
+
+// 服务器启动时加载线程数据
+async function loadThreads() {
+    try {
+        const data = await fs.readFile(THREADS_FILE, 'utf8');
+        threads = JSON.parse(data);
+    } catch (error) {
+        if (error.code !== 'ENOENT') {
+            console.error('Error reading threads file:', error);
+        }
+        // 如果文件不存在，就初始化为空数组
+        threads = [];
+    }
+}
+
+// 在创建新线程或回复消息时保存线程数据
+async function saveThreads() {
+    try {
+        await fs.writeFile(THREADS_FILE, JSON.stringify(threads, null, 2), 'utf8');
+    } catch (error) {
+        console.error('Error writing threads file:', error);
+    }
+}
 
 // 提供静态文件的中间件
 app.use(serve(path.join(__dirname, 'public')));
 
 app.use(bodyParser());
 
-const threads = []; // 存储 threads 的数组
 
 router.get('/threads', async ctx => {
+    ctx.set('Cache-Control', 'no-cache, no-store, must-revalidate');  // 禁止缓存
+    ctx.set('Pragma', 'no-cache');
+    ctx.set('Expires', '0');
     ctx.body = threads.map(t => ({ id: t.id, messageCount: t.messages.length }));
 });
 
@@ -34,6 +62,7 @@ router.post('/create-thread', async ctx => {
     const newThread = { id: newThreadId, messages: [] };
     threads.push(newThread);
     ctx.body = { threadId: newThreadId };
+    await saveThreads();  // 保存更新后的线程数据
 });
 
 router.post('/reply', async ctx => {
@@ -69,8 +98,11 @@ router.post('/reply', async ctx => {
         thread.messages.push({ sender: 'bot', text: reply });
         ctx.body = { reply, threadId };
     }
+    await saveThreads();  // 保存更新后的线程数据
+
 });
 
+loadThreads();
 
 
 app.use(router.routes()).use(router.allowedMethods());
