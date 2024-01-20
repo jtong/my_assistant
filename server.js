@@ -80,48 +80,61 @@ router.post('/reply', async ctx => {
     // 添加用户消息到 thread
     thread.messages.push({ sender: 'user', text: userMessage, id: messageId });
     
-    let reply_messageId = 'msg_' + Math.random().toString(36).substr(2, 9);
-    let reply;
-    if (userMessage.includes("form")) {
-        const formHtml = `
-            <form id="special-form" action="/submit-form">
-                <label for="name">姓名:</label>
-                <input type="text" id="name" name="name"><br><br>
-                <label for="email">邮箱:</label>
-                <input type="text" id="email" name="email"><br><br>
-                <input type="submit" value="提交">
-                <button type="button" class="cancel-btn">取消</button>
-            </form>
-        `;
+    // 使用 generateReply 函数生成回复
+    const replyMessage = await generateReply(userMessage, threadId);
 
-        const message  = { id: reply_messageId, sender: 'bot', text: formHtml, isHtml: true, formSubmitted: false };
-        thread.messages.push(message);
-        ctx.body = { message, threadId };
-    } else {
-        reply = `回复: ${userMessage}`;
-        const message  = { id: reply_messageId, sender: 'bot', text: reply };
+    // 将生成的回复添加到 thread
+    thread.messages.push(replyMessage);
 
-        thread.messages.push(message);
-        ctx.body = { message, threadId };
-    }
+    // 返回回复给客户端
+    ctx.body = { message: replyMessage, threadId };
+
     await saveThreads();  // 保存更新后的线程数据
 
 });
 
+async function generateReply(userMessage, threadId) {
+    // 示例逻辑: 根据用户消息生成回复
+    let replyText;
+    let isHtml = false;
+
+    if (userMessage.includes("form")) {
+        replyText = `<form id="special-form" action="/submit-form">
+                        <label for="name">姓名:</label>
+                        <input type="text" id="name" name="name"><br><br>
+                        <label for="email">邮箱:</label>
+                        <input type="text" id="email" name="email"><br><br>
+                        <input type="submit" value="提交">
+                        <button type="button" class="cancel-btn">取消</button>
+                     </form>`;
+        isHtml = true;
+    } else {
+        replyText = `回复: ${userMessage}`;
+    }
+
+    return {
+        id: 'msg_' + Math.random().toString(36).substr(2, 9),
+        sender: 'bot',
+        text: replyText,
+        isHtml: isHtml
+    };
+}
+
+
 router.post('/form-submitted', async ctx => {
     const { threadId, messageId, submitted } = ctx.request.body;
     const thread = threads.find(t => t.id === threadId);
-    console.log(thread);
+    // console.log(thread);
     if (thread) {
         const message = thread.messages.find(m => m.id === messageId);
-        console.log(message);
+        // console.log(message);
         if (message) {
             message.formSubmitted = submitted;
             await saveThreads();
             ctx.body = { status: 'success' };
             return;
         }
-    }//msg_b4hnpi4no
+    }
     ctx.status = 404;
     ctx.body = { status: 'error', message: 'Thread or message not found' };
 });
