@@ -66,6 +66,7 @@ router.post('/create-thread', async ctx => {
 });
 
 router.post('/reply', async ctx => {
+    const messageId = ctx.request.body.messageId;
     const userMessage = ctx.request.body.message;
     const threadId = ctx.request.body.threadId || 'default';
 
@@ -77,8 +78,9 @@ router.post('/reply', async ctx => {
     }
 
     // 添加用户消息到 thread
-    thread.messages.push({ sender: 'user', text: userMessage });
-
+    thread.messages.push({ sender: 'user', text: userMessage, id: messageId });
+    
+    let reply_messageId = 'msg_' + Math.random().toString(36).substr(2, 9);
     let reply;
     if (userMessage.includes("form")) {
         const formHtml = `
@@ -91,15 +93,37 @@ router.post('/reply', async ctx => {
                 <button type="button" class="cancel-btn">取消</button>
             </form>
         `;
-        thread.messages.push({ sender: 'bot', text: formHtml, isHtml: true });
-        ctx.body = { html: formHtml, threadId };
+
+        const message  = { id: reply_messageId, sender: 'bot', text: formHtml, isHtml: true, formSubmitted: false };
+        thread.messages.push(message);
+        ctx.body = { message, threadId };
     } else {
         reply = `回复: ${userMessage}`;
-        thread.messages.push({ sender: 'bot', text: reply });
-        ctx.body = { reply, threadId };
+        const message  = { id: reply_messageId, sender: 'bot', text: reply };
+
+        thread.messages.push(message);
+        ctx.body = { message, threadId };
     }
     await saveThreads();  // 保存更新后的线程数据
 
+});
+
+router.post('/form-submitted', async ctx => {
+    const { threadId, messageId, submitted } = ctx.request.body;
+    const thread = threads.find(t => t.id === threadId);
+    console.log(thread);
+    if (thread) {
+        const message = thread.messages.find(m => m.id === messageId);
+        console.log(message);
+        if (message) {
+            message.formSubmitted = submitted;
+            await saveThreads();
+            ctx.body = { status: 'success' };
+            return;
+        }
+    }//msg_b4hnpi4no
+    ctx.status = 404;
+    ctx.body = { status: 'error', message: 'Thread or message not found' };
 });
 
 loadThreads();

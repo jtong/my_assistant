@@ -25,4 +25,12 @@
 
 ## 任务
 
-我希望 提交或取消后，表单就不能再提交或取消了，也就是对应的按钮要被取消。现在有bug，点了提交按钮，刷新后又出现了
+我希望 提交或取消后，表单就不能再提交或取消了，也就是对应的按钮要被取消。现在有bug，报错：
+
+```
+Uncaught (in promise) ReferenceError: threads is not defined
+    at displayHtml (script.js:160:25)
+    at script.js:76:21
+    at Array.forEach (<anonymous>)
+    at script.js:73:22
+```
