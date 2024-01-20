@@ -8,8 +8,36 @@ document.getElementById('user-input').addEventListener('keydown', function(event
 });
 
 
+window.onload = function() {
+    loadThreads();
+    // 其他已有的初始化代码
+};
+
+
+function loadThreads() {
+    fetch('/threads')
+        .then(response => response.json())
+        .then(threads => {
+            const threadList = document.getElementById('thread-list');
+            threadList.innerHTML = '';
+            threads.forEach(thread => {
+                const li = document.createElement('li');
+                li.textContent = `Thread ${thread.id} (${thread.messageCount} messages)`;
+                li.onclick = function() { loadMessages(thread.id); };
+                threadList.appendChild(li);
+            });
+        });
+}
+
+function loadMessages(threadId) {
+    // 实现加载特定 thread 的消息
+    // ...
+}
+
 function sendMessage() {
     var userInput = document.getElementById('user-input').value;
+    var threadId = getThreadId(); // 获取或生成 thread ID
+
     if (userInput) {
         // 显示用户输入
         displayMessage(userInput, 'user');
@@ -20,7 +48,7 @@ function sendMessage() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ message: userInput })
+            body: JSON.stringify({ message: userInput, threadId: threadId })
         })
         .then(response => response.json())
         .then(data => {
@@ -36,6 +64,15 @@ function sendMessage() {
         // 清空输入框
         document.getElementById('user-input').value = '';
     }
+}
+
+function getThreadId() {
+    // 生成或返回现有的 thread ID
+    // 这里只是一个示例，您可以使用更复杂的逻辑来生成和管理 thread ID
+    if (!window.threadId) {
+        window.threadId = 'thread_' + Math.random().toString(36).substr(2, 9);
+    }
+    return window.threadId;
 }
 
 
@@ -71,9 +108,12 @@ function setupForm(form) {
         }).then(response => {
             // 处理响应
             // ...
+            console.log(response);
         }).catch(error => {
             // 处理错误
             // ...
+            console.log(error);
+
         });
 
         // 隐藏提交和取消按钮

@@ -1,9 +1,28 @@
+#thread-list-container {
+    width: 19%;
+    float: left;
+    height: 500px;
+    overflow-y: auto;
+}
+
+#thread-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#thread-list li {
+    cursor: pointer;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
 #chat-container {
-    width: 80%;
+    width: 78%;  /* 更新宽度 */
+    float: right;
     margin: auto;
     height: 500px;
     border: 1px solid #ddd;
-    padding: 20px;
+    padding: 10px;
 }
 
 #chat-box {

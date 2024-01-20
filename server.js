@@ -12,9 +12,27 @@ app.use(serve(path.join(__dirname, 'public')));
 
 app.use(bodyParser());
 
+const threads = []; // 存储 threads 的数组
+
+router.get('/threads', async ctx => {
+    ctx.body = threads.map(t => ({ id: t.id, messageCount: t.messages.length }));
+});
+
 router.post('/reply', async ctx => {
     const userMessage = ctx.request.body.message;
+    const threadId = ctx.request.body.threadId || 'default';
 
+    // 查找或创建新的 thread
+    let thread = threads.find(t => t.id === threadId);
+    if (!thread) {
+        thread = { id: threadId, messages: [] };
+        threads.push(thread);
+    }
+
+    // 添加用户消息到 thread
+    thread.messages.push({ sender: 'user', text: userMessage });
+
+    let reply;
     if (userMessage.includes("form")) {
         const formHtml = `
             <form id="special-form" action="/submit-form">
@@ -26,12 +44,15 @@ router.post('/reply', async ctx => {
                 <button type="button" class="cancel-btn">取消</button>
             </form>
         `;
-        ctx.body = { html: formHtml };
+        thread.messages.push({ sender: 'bot', text: formHtml, isHtml: true });
+        ctx.body = { html: formHtml, threadId };
     } else {
-        const reply = `回复: ${userMessage}`;
-        ctx.body = { reply };
+        reply = `回复: ${userMessage}`;
+        thread.messages.push({ sender: 'bot', text: reply });
+        ctx.body = { reply, threadId };
     }
 });
+
 
 
 app.use(router.routes()).use(router.allowedMethods());
