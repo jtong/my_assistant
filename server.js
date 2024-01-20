@@ -18,6 +18,24 @@ router.get('/threads', async ctx => {
     ctx.body = threads.map(t => ({ id: t.id, messageCount: t.messages.length }));
 });
 
+router.get('/thread/:threadId', async ctx => {
+    const threadId = ctx.params.threadId;
+    const thread = threads.find(t => t.id === threadId);
+    if (thread) {
+        ctx.body = thread.messages;
+    } else {
+        ctx.status = 404;
+        ctx.body = { error: "Thread not found" };
+    }
+});
+
+router.post('/create-thread', async ctx => {
+    const newThreadId = 'thread_' + Math.random().toString(36).substr(2, 9);
+    const newThread = { id: newThreadId, messages: [] };
+    threads.push(newThread);
+    ctx.body = { threadId: newThreadId };
+});
+
 router.post('/reply', async ctx => {
     const userMessage = ctx.request.body.message;
     const threadId = ctx.request.body.threadId || 'default';

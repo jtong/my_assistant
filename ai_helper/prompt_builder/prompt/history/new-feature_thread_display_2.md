@@ -25,4 +25,4 @@
 
 ## 任务
 
-我希望 存在一个新建按钮，可以新建thread，后面发的消息都是在这个thread里，而且thread列表会自动更新。当我点击了某个thread，那么后面发的消息也都在点击了的那个thread里。
+我希望 webUI显示的thread，点击后可以显示当前thread的所有的历史message。

@@ -7,6 +7,18 @@ document.getElementById('user-input').addEventListener('keydown', function(event
     }
 });
 
+document.getElementById('create-thread-btn').addEventListener('click', createThread);
+
+function createThread() {
+    fetch('/create-thread', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.threadId) {
+                window.threadId = data.threadId;
+                loadThreads();
+            }
+        });
+}
 
 window.onload = function() {
     loadThreads();
@@ -23,20 +35,36 @@ function loadThreads() {
             threads.forEach(thread => {
                 const li = document.createElement('li');
                 li.textContent = `Thread ${thread.id} (${thread.messageCount} messages)`;
-                li.onclick = function() { loadMessages(thread.id); };
+                li.onclick = function() { 
+                    window.threadId = thread.id;
+                    loadMessages(thread.id); 
+                };
                 threadList.appendChild(li);
             });
         });
 }
 
+
 function loadMessages(threadId) {
-    // 实现加载特定 thread 的消息
-    // ...
+    fetch('/thread/' + threadId)
+        .then(response => response.json())
+        .then(messages => {
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML = ''; // 清空当前聊天框中的内容
+            messages.forEach(message => {
+                // 根据消息类型添加不同的处理
+                if (message.isHtml) {
+                    displayHtml(message.text);
+                } else {
+                    displayMessage(message.text, message.sender);
+                }
+            });
+        });
 }
 
 function sendMessage() {
     var userInput = document.getElementById('user-input').value;
-    var threadId = getThreadId(); // 获取或生成 thread ID
+    var threadId = window.threadId || createThread(); // 确保有一个有效的线程 ID
 
     if (userInput) {
         // 显示用户输入
@@ -64,15 +92,6 @@ function sendMessage() {
         // 清空输入框
         document.getElementById('user-input').value = '';
     }
-}
-
-function getThreadId() {
-    // 生成或返回现有的 thread ID
-    // 这里只是一个示例，您可以使用更复杂的逻辑来生成和管理 thread ID
-    if (!window.threadId) {
-        window.threadId = 'thread_' + Math.random().toString(36).substr(2, 9);
-    }
-    return window.threadId;
 }
 
 
