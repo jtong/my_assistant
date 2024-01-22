@@ -81,7 +81,7 @@ router.post('/reply', async ctx => {
     thread.messages.push({ sender: 'user', text: userMessage, id: messageId });
     
     // 使用 generateReply 函数生成回复
-    const replyMessage = await generateReply(userMessage, threadId);
+    const replyMessage = await generateReply(userMessage, thread);
 
     // 将生成的回复添加到 thread
     thread.messages.push(replyMessage);
@@ -92,11 +92,13 @@ router.post('/reply', async ctx => {
     await saveThreads();  // 保存更新后的线程数据
 
 });
-
-async function generateReply(userMessage, threadId) {
+async function generateReply(userMessage, thread) {
     // 示例逻辑: 根据用户消息生成回复
     let replyText;
     let isHtml = false;
+
+    // 你可以使用 thread 对象来访问当前线程的详细信息
+    // 例如: thread.id 或者 thread.messages
 
     if (userMessage.includes("form")) {
         replyText = `<form id="special-form" action="/submit-form">
@@ -116,10 +118,10 @@ async function generateReply(userMessage, threadId) {
         id: 'msg_' + Math.random().toString(36).substr(2, 9),
         sender: 'bot',
         text: replyText,
-        isHtml: isHtml
+        isHtml: isHtml,
+        threadId: thread.id
     };
 }
-
 
 router.post('/form-submitted', async ctx => {
     const { threadId, messageId, submitted } = ctx.request.body;
