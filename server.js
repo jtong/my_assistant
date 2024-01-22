@@ -135,6 +135,20 @@ router.get('/agents', async ctx => {
     ctx.body = agents;
 });
 
+router.delete('/delete-thread/:threadId', async ctx => {
+    const threadId = ctx.params.threadId;
+    const threadIndex = threads.findIndex(t => t.id === threadId);
+    if (threadIndex > -1) {
+        threads.splice(threadIndex, 1); // 从数组中移除线程
+        await saveThreads(); // 保存更改
+        ctx.body = { status: 'success' };
+    } else {
+        ctx.status = 404;
+        ctx.body = { error: "Thread not found" };
+    }
+});
+
+
 loadThreads();
 
 

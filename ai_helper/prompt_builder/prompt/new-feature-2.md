@@ -25,9 +25,9 @@
 ```yaml
 - path: server.js
   reader: all    
-- path: strategies.js
+- path: agents.js
   reader: all
-- path: StrategyManager.js
+- path: AgentManager.js
   reader: all
 - path: package.json
   reader: all    
@@ -36,4 +36,4 @@
 
 ## 任务
 
-我希望 把strategy换成agent，agent比strategy更适合业务概念
+我希望 前端的 thread 列表里的元素支持删除功能

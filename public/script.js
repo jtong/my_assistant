@@ -86,22 +86,46 @@ function loadThreads() {
             'Pragma': 'no-cache'
         }
     })
-        .then(response => response.json())
-        .then(threads => {
-            const threadList = document.getElementById('thread-list');
-            threadList.innerHTML = ''; // 清空现有的线程列表
-            threads.forEach(thread => {
-                const li = document.createElement('li');
-                li.textContent = `${thread.id} ： (${thread.messageCount} messages)`;
-                li.onclick = function () {
-                    window.threadId = thread.id;
-                    loadMessages(thread.id);
-                    // 更新 URL
-                    window.history.pushState({ threadId: thread.id }, '', `?threadId=${thread.id}`);
-                };
-                threadList.appendChild(li);
-            });
+    .then(response => response.json())
+    .then(threads => {
+        const threadList = document.getElementById('thread-list');
+        threadList.innerHTML = ''; // 清空现有的线程列表
+        threads.forEach(thread => {
+            const li = document.createElement('li');
+            li.textContent = `${thread.id} ： (${thread.messageCount} messages)`;
+
+            // 创建删除按钮
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = '删除';
+            deleteBtn.onclick = function(event) {
+                event.stopPropagation(); // 阻止事件冒泡
+                deleteThread(thread.id);
+            };
+            li.appendChild(deleteBtn);
+
+            li.onclick = function () {
+                window.threadId = thread.id;
+                loadMessages(thread.id);
+                // 更新 URL
+                window.history.pushState({ threadId: thread.id }, '', `?threadId=${thread.id}`);
+            };
+            threadList.appendChild(li);
         });
+    });
+}
+
+function deleteThread(threadId) {
+    if (confirm('确定要删除这个线程吗？')) {
+        fetch(`/delete-thread/${threadId}`, { method: 'DELETE' })
+            .then(response => {
+                if (response.ok) {
+                    loadThreads(); // 重新加载线程列表
+                } else {
+                    alert('删除线程失败');
+                }
+            })
+            .catch(error => console.error('删除线程时出错:', error));
+    }
 }
 
 
