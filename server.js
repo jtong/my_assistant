@@ -64,7 +64,8 @@ router.get('/thread/:threadId', async ctx => {
 
 router.post('/create-thread', async ctx => {
     const newThreadId = 'thread_' + Math.random().toString(36).substr(2, 9);
-    const newThread = { id: newThreadId, messages: [] };
+    const strategy = ctx.request.body.strategy || 'default'; // 默认为 'default'
+    const newThread = { id: newThreadId, strategy: strategy, messages: [] }; // 现在线程对象包括策略
     threads.push(newThread);
     ctx.body = { threadId: newThreadId };
     await saveThreads();  // 保存更新后的线程数据
@@ -127,6 +128,11 @@ router.delete('/clear-thread/:threadId', async ctx => {
         ctx.status = 404;
         ctx.body = { error: "Thread not found" };
     }
+});
+
+router.get('/strategies', async ctx => {
+    const strategies = Object.keys(strategyManager.strategies); // 假设这会返回所有策略的键数组
+    ctx.body = strategies;
 });
 
 

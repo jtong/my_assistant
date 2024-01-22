@@ -11,16 +11,23 @@ document.getElementById('user-input').addEventListener('keydown', function (even
 document.getElementById('create-thread-btn').addEventListener('click', createThread);
 
 function createThread() {
-    fetch('/create-thread', { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            if (data.threadId) {
-                window.threadId = data.threadId;
-                loadThreads();  // 加载新的线程列表
-                // 更新 URL
-                window.history.pushState({ threadId: data.threadId }, '', `?threadId=${data.threadId}`);
-            }
-        });
+    const selectedStrategy = document.getElementById('strategy-select').value; // 获取选定的策略
+    fetch('/create-thread', { 
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ strategy: selectedStrategy }) // 包含策略在请求体中
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.threadId) {
+            window.threadId = data.threadId;
+            loadThreads();  // 加载新的线程列表
+            // 更新 URL
+            window.history.pushState({ threadId: data.threadId }, '', `?threadId=${data.threadId}`);
+        }
+    });
 }
 
 
@@ -44,6 +51,7 @@ function clearThreadMessages() {
 
 window.onload = function () {
     loadThreads();
+    loadStrategies(); // 调用加载策略的函数
 
     // 其他已有的初始化代码
     const urlParams = new URLSearchParams(window.location.search);
@@ -55,6 +63,20 @@ window.onload = function () {
         loadMessages(threadIdFromUrl);
     }
 };
+
+function loadStrategies() {
+    fetch('/strategies')
+        .then(response => response.json())
+        .then(strategies => {
+            const strategySelect = document.getElementById('strategy-select');
+            strategies.forEach(strategy => {
+                const option = document.createElement('option');
+                option.value = strategy;
+                option.textContent = strategy; // 假设策略的键可以直接作为选项的显示文本
+                strategySelect.appendChild(option);
+            });
+        });
+}
 
 
 function loadThreads() {
