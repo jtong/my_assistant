@@ -4,7 +4,11 @@ const bodyParser = require('koa-bodyparser');
 const serve = require('koa-static');
 const path = require('path');
 const fs = require('fs').promises;  // 异步文件操作
-const generateReply = require('./replyGenerator');
+const strategyManager = require('./strategies');
+
+async function generateReply(userMessage, thread) {
+    return strategyManager.executeStrategy(userMessage, thread);
+}
 
 const app = new Koa();
 const router = new Router();

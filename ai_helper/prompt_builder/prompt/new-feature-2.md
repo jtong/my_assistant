@@ -6,7 +6,7 @@
 {{ folder_tree }}
 ```
 
-## 相关文件
+## 前端相关文件
 
 {{#related_files_from }}
 ```yaml
@@ -16,10 +16,19 @@
   reader: all
 - path: public/script.js
   reader: all  
+```
+{{/related_files_from }}
+
+## 后端相关文件
+
+{{#related_files_from }}
+```yaml
 - path: server.js
   reader: all    
-- path: replyGenerator.js
-  reader: all  
+- path: strategies.js
+  reader: all
+- path: StrategyManager.js
+  reader: all
 - path: package.json
   reader: all    
 ```
