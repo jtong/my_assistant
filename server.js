@@ -4,6 +4,7 @@ const bodyParser = require('koa-bodyparser');
 const serve = require('koa-static');
 const path = require('path');
 const fs = require('fs').promises;  // 异步文件操作
+const generateReply = require('./replyGenerator');
 
 const app = new Koa();
 const router = new Router();
@@ -92,36 +93,6 @@ router.post('/reply', async ctx => {
     await saveThreads();  // 保存更新后的线程数据
 
 });
-async function generateReply(userMessage, thread) {
-    // 示例逻辑: 根据用户消息生成回复
-    let replyText;
-    let isHtml = false;
-
-    // 你可以使用 thread 对象来访问当前线程的详细信息
-    // 例如: thread.id 或者 thread.messages
-
-    if (userMessage.includes("form")) {
-        replyText = `<form id="special-form" action="/submit-form">
-                        <label for="name">姓名:</label>
-                        <input type="text" id="name" name="name"><br><br>
-                        <label for="email">邮箱:</label>
-                        <input type="text" id="email" name="email"><br><br>
-                        <input type="submit" value="提交">
-                        <button type="button" class="cancel-btn">取消</button>
-                     </form>`;
-        isHtml = true;
-    } else {
-        replyText = `回复: ${userMessage}`;
-    }
-
-    return {
-        id: 'msg_' + Math.random().toString(36).substr(2, 9),
-        sender: 'bot',
-        text: replyText,
-        isHtml: isHtml,
-        threadId: thread.id
-    };
-}
 
 router.post('/form-submitted', async ctx => {
     const { threadId, messageId, submitted } = ctx.request.body;

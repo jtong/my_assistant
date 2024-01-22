@@ -25,4 +25,4 @@
 
 ## 任务
 
-我希望 后端的generateReply的函数传的是thread对象而不只是threadId
+我希望 后端的generateReply的函数作为一个扩展点存在，它可能是require进来的一个单独文件。
