@@ -1,13 +1,13 @@
-// strategies.js
+// agents.js
 
-const { StrategyManager, ReplyStrategy } = require('./StrategyManager');
+const { AgentManager, ReplyAgent } = require('./AgentManager');
 
 
 // 实例化策略管理器
-const strategyManager = new StrategyManager();
+const agentManager = new AgentManager();
 
 // 注册默认策略
-class DefaultReplyStrategy extends ReplyStrategy {
+class DefaultReplyAgent extends ReplyAgent {
     async execute(userMessage, thread) {
         // 默认策略的实现
         let replyText;
@@ -37,14 +37,7 @@ class DefaultReplyStrategy extends ReplyStrategy {
     }
 }
 
-strategyManager.registerStrategy('default', new DefaultReplyStrategy());
+agentManager.registerAgent('default', new DefaultReplyAgent());
 
-// 示例：注册自定义策略
-// class CustomReplyStrategy extends ReplyStrategy {
-//     async execute(userMessage, thread) {
-//         // 自定义策略的实现...
-//     }
-// }
-// strategyManager.registerStrategy('customKey', new CustomReplyStrategy());
 
-module.exports = strategyManager;
+module.exports = agentManager;

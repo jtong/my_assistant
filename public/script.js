@@ -11,13 +11,13 @@ document.getElementById('user-input').addEventListener('keydown', function (even
 document.getElementById('create-thread-btn').addEventListener('click', createThread);
 
 function createThread() {
-    const selectedStrategy = document.getElementById('strategy-select').value; // 获取选定的策略
+    const selectedAgent = document.getElementById('agent-select').value; // 获取选定的策略
     fetch('/create-thread', { 
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ strategy: selectedStrategy }) // 包含策略在请求体中
+        body: JSON.stringify({ agent: selectedAgent }) // 包含策略在请求体中
     })
     .then(response => response.json())
     .then(data => {
@@ -51,7 +51,7 @@ function clearThreadMessages() {
 
 window.onload = function () {
     loadThreads();
-    loadStrategies(); // 调用加载策略的函数
+    loadAgents(); // 调用加载策略的函数
 
     // 其他已有的初始化代码
     const urlParams = new URLSearchParams(window.location.search);
@@ -64,16 +64,16 @@ window.onload = function () {
     }
 };
 
-function loadStrategies() {
-    fetch('/strategies')
+function loadAgents() {
+    fetch('/agents')
         .then(response => response.json())
-        .then(strategies => {
-            const strategySelect = document.getElementById('strategy-select');
-            strategies.forEach(strategy => {
+        .then(agents => {
+            const agentSelect = document.getElementById('agent-select');
+            agents.forEach(agent => {
                 const option = document.createElement('option');
-                option.value = strategy;
-                option.textContent = strategy; // 假设策略的键可以直接作为选项的显示文本
-                strategySelect.appendChild(option);
+                option.value = agent;
+                option.textContent = agent; // 假设策略的键可以直接作为选项的显示文本
+                agentSelect.appendChild(option);
             });
         });
 }

@@ -4,10 +4,10 @@ const bodyParser = require('koa-bodyparser');
 const serve = require('koa-static');
 const path = require('path');
 const fs = require('fs').promises;  // 异步文件操作
-const strategyManager = require('./strategies');
+const agentManager = require('./agents');
 
 async function generateReply(userMessage, thread) {
-    return strategyManager.executeStrategy(userMessage, thread);
+    return agentManager.executeAgent(userMessage, thread);
 }
 
 const app = new Koa();
@@ -64,8 +64,8 @@ router.get('/thread/:threadId', async ctx => {
 
 router.post('/create-thread', async ctx => {
     const newThreadId = 'thread_' + Math.random().toString(36).substr(2, 9);
-    const strategy = ctx.request.body.strategy || 'default'; // 默认为 'default'
-    const newThread = { id: newThreadId, strategy: strategy, messages: [] }; // 现在线程对象包括策略
+    const agent = ctx.request.body.agent || 'default'; // 默认为 'default'
+    const newThread = { id: newThreadId, agent: agent, messages: [] }; // 现在线程对象包括策略
     threads.push(newThread);
     ctx.body = { threadId: newThreadId };
     await saveThreads();  // 保存更新后的线程数据
@@ -130,11 +130,10 @@ router.delete('/clear-thread/:threadId', async ctx => {
     }
 });
 
-router.get('/strategies', async ctx => {
-    const strategies = Object.keys(strategyManager.strategies); // 假设这会返回所有策略的键数组
-    ctx.body = strategies;
+router.get('/agents', async ctx => {
+    const agents = Object.keys(agentManager.agents); // 假设这会返回所有代理的键数组
+    ctx.body = agents;
 });
-
 
 loadThreads();
 

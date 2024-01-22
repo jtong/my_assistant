@@ -36,4 +36,4 @@
 
 ## 任务
 
-我希望 前端新建thread的时候，可以选择不同的strategy作为thread的一个属性
+我希望 把strategy换成agent，agent比strategy更适合业务概念
