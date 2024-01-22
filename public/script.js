@@ -7,6 +7,7 @@ document.getElementById('user-input').addEventListener('keydown', function (even
     }
 });
 
+
 document.getElementById('create-thread-btn').addEventListener('click', createThread);
 
 function createThread() {
@@ -22,6 +23,24 @@ function createThread() {
         });
 }
 
+
+document.getElementById('clear-thread-btn').addEventListener('click', clearThreadMessages);
+function clearThreadMessages() {
+    if (!window.threadId) {
+        alert('没有选定的对话线程！');
+        return;
+    }
+
+    if (confirm('确定要清除当前对话的所有消息吗？')) {
+        fetch(`/clear-thread/${window.threadId}`, { method: 'DELETE' })
+            .then(response => {
+                if (response.ok) {
+                    loadMessages(window.threadId); // 重新加载消息，此时应为空
+                }
+            })
+            .catch(error => console.error('清除对话时出错:', error));
+    }
+}
 
 window.onload = function () {
     loadThreads();

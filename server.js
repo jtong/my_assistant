@@ -116,6 +116,20 @@ router.post('/form-submitted', async ctx => {
     ctx.body = { status: 'error', message: 'Thread or message not found' };
 });
 
+router.delete('/clear-thread/:threadId', async ctx => {
+    const threadId = ctx.params.threadId;
+    const threadIndex = threads.findIndex(t => t.id === threadId);
+    if (threadIndex > -1) {
+        threads[threadIndex].messages = []; // 清空消息
+        await saveThreads(); // 保存更改
+        ctx.body = { status: 'success' };
+    } else {
+        ctx.status = 404;
+        ctx.body = { error: "Thread not found" };
+    }
+});
+
+
 loadThreads();
 
 
