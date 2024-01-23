@@ -1,8 +1,4 @@
-class ReplyAgent {
-    async execute(userMessage, thread) {
-        throw new Error("Method 'execute()' must be implemented.");
-    }
-}
+const { ReplyAgent } = require("agent-base");
 
 class AgentManager {
     constructor() {
