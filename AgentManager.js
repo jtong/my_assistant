@@ -12,8 +12,7 @@ class AgentManager {
     }
 
     async executeAgent(userMessage, thread) {
-        // 示例条件选择逻辑，可以根据实际需要修改
-        let agentKey = Object.keys(this.agents).find(key => userMessage.includes(key)) || 'default';
+        let agentKey = thread.agent;
 
         if (this.agents[agentKey]) {
             return this.agents[agentKey].execute(userMessage, thread);

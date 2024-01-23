@@ -39,5 +39,7 @@ class DefaultReplyAgent extends ReplyAgent {
 
 agentManager.registerAgent('default', new DefaultReplyAgent());
 
+const {GreenTeaReplyAgent} = require("green-tea");
+agentManager.registerAgent('green_tea', new GreenTeaReplyAgent());
 
 module.exports = agentManager;
