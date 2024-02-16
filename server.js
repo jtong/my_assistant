@@ -83,12 +83,16 @@ router.post('/reply', async ctx => {
         threads.push(thread);
     }
 
-    // 添加用户消息到 thread
-    thread.messages.push({ sender: 'user', text: userMessage, id: messageId });
+    const timestamp = Date.now(); // 添加时间戳
+
+    thread.messages.push({ sender: 'user', text: userMessage, id: messageId, timestamp });
     
     // 使用 generateReply 函数生成回复
     const replyMessage = await generateReply(userMessage, thread);
 
+    // 添加时间戳
+    replyMessage.timestamp = timestamp;
+    
     // 将生成的回复添加到 thread
     thread.messages.push(replyMessage);
 

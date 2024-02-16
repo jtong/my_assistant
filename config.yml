@@ -18,7 +18,7 @@ project:
       - .DS_Store
 input:
   prompt_template:
-    path: ai_helper/prompt_builder/prompt    
+    path: ai_helper/prompt_builder/prompt   
   relative_files:
     template: >
       ```yaml
@@ -26,6 +26,6 @@ input:
       {{{content}}}
 
       ```
-output:     
+output:
   prompt:
     path: ai_helper/prompt_builder/output/
