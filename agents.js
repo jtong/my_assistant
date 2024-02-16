@@ -12,6 +12,7 @@ class DefaultReplyAgent extends ReplyAgent {
         // 默认策略的实现
         let replyText;
         let isHtml = false;
+        let additionalData = {}; // 用于存储额外的JSON数据
 
         if (userMessage.includes("form")) {
             replyText = `<form id="special-form" action="/submit-form">
@@ -27,12 +28,19 @@ class DefaultReplyAgent extends ReplyAgent {
             replyText = `回复: ${userMessage}`;
         }
 
+        if (userMessage === "需要按钮") {
+            additionalData = {
+                button: true, // 示范布尔值，将会渲染为按钮
+                options: ["选项1", "选项2"] // 示范字符串数组，将会渲染为select
+            };
+        }
         return {
             id: 'msg_' + Math.random().toString(36).substr(2, 9),
             sender: 'bot',
             text: replyText,
             isHtml: isHtml,
-            threadId: thread.id
+            threadId: thread.id,
+            additionalData: additionalData // 将additionalData包含在返回的消息中
         };
     }
 }

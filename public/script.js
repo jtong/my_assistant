@@ -136,11 +136,13 @@ function loadMessages(threadId) {
             const chatBox = document.getElementById('chat-box');
             chatBox.innerHTML = ''; // 清空当前聊天框中的内容
             messages.forEach(message => {
-                // 根据消息类型添加不同的处理
-                if (message.isHtml) {
-                    displayHtml(message.text, message);
-                } else {
-                    displayMessage(message.text, message.sender);
+                // 根据sender类型添加不同的处理
+                if (message.sender === 'user') {
+                    // 如果消息是用户发送的
+                    displayUserMessage(message.text, message.sender, message.id);
+                } else if (message.sender === 'bot') {
+                    // 如果消息是机器人发送的
+                    displayBotMessage(message, message.sender, message.id, message.additionalData);
                 }
             });
         });
@@ -155,7 +157,7 @@ function sendMessage() {
         let messageId = 'msg_' + Math.random().toString(36).substr(2, 9);
 
         // 显示用户输入
-        displayMessage(userInput, 'user', messageId);
+        displayUserMessage(userInput, 'user', messageId);
 
         // 发送到后端并获取回复
         fetch('/reply', {
@@ -167,13 +169,7 @@ function sendMessage() {
         })
             .then(response => response.json())
             .then(data => {
-                if (data.message.isHtml) {
-                    // 如果响应包含HTML，直接将其显示在聊天框中
-                    displayHtml(data.message.text, data.message);
-                } else {
-                    // 否则，显示文本消息
-                    displayMessage(data.message.text, data.message.sender, data.message.id);
-                }
+                displayBotMessage(data.message, data.message.sender, data.message.id);
 
                 // 更新表单提交状态
                 updateFormStatus(threadId, messageId, false);
@@ -203,15 +199,57 @@ function updateFormStatus(threadId, messageId, submitted) {
     });
 }
 
-
-function displayMessage(message, sender, messageId) {
-    var chatBox = document.getElementById('chat-box');
-    var messageElement = document.createElement('div');
+function displayUserMessage(message, sender, messageId) {
+    const chatBox = document.getElementById('chat-box');
+    const messageElement = document.createElement('div');
     messageElement.classList.add(sender);
     messageElement.textContent = message;
     if (messageId) {
         messageElement.setAttribute('data-message-id', messageId);
     }
+    chatBox.appendChild(messageElement);
+}
+
+function displayBotMessage(message, sender, messageId, additionalData) {
+    const chatBox = document.getElementById('chat-box');
+    const messageElement = document.createElement('div');
+    messageElement.classList.add(sender);
+
+    // 检查消息是否包含HTML内容
+    if (message.isHtml) {
+        displayHtml(message.text, message);
+    } else {
+        // 如果不是HTML，设置textContent以避免HTML注入
+        messageElement.textContent = message.text;
+    }
+
+    // 根据additionalData渲染额外的元素
+    if (message.additionalData) {
+        if (additionalData.button) {
+            const button = document.createElement('button');
+            button.textContent = "操作";
+            button.addEventListener('click', function() {
+                // 处理按钮点击事件
+                displayJson(additionalData); // 示范函数，用于显示或处理JSON数据
+            });
+            messageElement.appendChild(button);
+        }
+        if (additionalData.options) {
+            const select = document.createElement('select');
+            additionalData.options.forEach(function(option) {
+                const optionElement = document.createElement('option');
+                optionElement.value = option;
+                optionElement.textContent = option;
+                select.appendChild(optionElement);
+            });
+            messageElement.appendChild(select);
+        }
+    }
+
+    if (messageId) {
+        messageElement.setAttribute('data-message-id', messageId);
+    }
+
     chatBox.appendChild(messageElement);
 }
 
