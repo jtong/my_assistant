@@ -87,6 +87,26 @@ router.post('/reply', async ctx => {
 
     const timestamp = Date.now(); // 添加时间戳
 
+    if (!actionAttributes) {
+        // 遍历线程中的所有消息，隐藏包含按钮的消息
+        // 找到最近的一条包含该按钮的消息，并更新按钮状态
+        let lastMessage = thread.messages[thread.messages.length - 1];
+        // console.log(lastMessage);
+        if(lastMessage.additionalData && lastMessage.additionalData.buttons){
+            lastMessage.ignoreButtons = true;
+        } 
+    } else {
+        const buttonName = actionAttributes.action; // 获取被点击的按钮名称
+        // 找到最近的一条包含该按钮的消息，并更新按钮状态
+        for (let i = thread.messages.length - 1; i >= 0; i--) {
+            const msg = thread.messages[i];
+            if (msg.additionalData && msg.additionalData.buttons && msg.additionalData.buttons.hasOwnProperty(buttonName)) {
+                msg.additionalData.buttons[buttonName] = true; // 更新按钮为已点击状态
+                break; // 找到并更新后退出循环
+            }
+        }
+    }
+
     thread.messages.push({ sender: 'user', text: userMessage, id: messageId, timestamp, actionAttributes });
     
     // 使用 generateReply 函数生成回复

@@ -150,6 +150,7 @@ function loadMessages(threadId) {
 
 function sendMessage(messageContent, actionAttributes = null) {
     const userInput = document.getElementById('user-input').value;
+    document.getElementById('user-input').value = "";
     const threadId = window.threadId || createThread(); // 确保有一个有效的线程 ID
     const messageId = 'msg_' + Math.random().toString(36).substr(2, 9);
 
@@ -158,7 +159,7 @@ function sendMessage(messageContent, actionAttributes = null) {
         threadId,
         messageId,
         // 如果存在动作属性，将其包含在发送的数据中
-        actionAttributes: actionAttributes
+        actionAttributes: actionAttributes,
     };
 
     // 显示用户输入
@@ -178,7 +179,9 @@ function sendMessage(messageContent, actionAttributes = null) {
                 console.log('处理动作执行事件的响应');
             } else {
                 // 处理普通消息的逻辑
+                
             }
+            displayBotMessage(data.message, data.message.sender, data.message.id, data.message.additionalData);
         })
         .catch(error => console.error('发送消息时出错:', error));
 }
@@ -233,7 +236,10 @@ function displayBotMessage(message, sender, messageId, additionalData) {
             buttonElement.textContent = buttonName;
             buttonElement.addEventListener('click', function () {
                 // 构建动作属性对象
-                const actionAttributes = { [buttonName]: true };
+                const actionAttributes = { 
+                    action: buttonName,
+                    value: true 
+                };
                 // 调用 sendMessage 函数并传递动作属性
                 sendMessage(`动作执行: ${buttonName}`, actionAttributes);
             });
