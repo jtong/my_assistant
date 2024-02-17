@@ -72,9 +72,11 @@ router.post('/create-thread', async ctx => {
 });
 
 router.post('/reply', async ctx => {
+
     const messageId = ctx.request.body.messageId;
     const userMessage = ctx.request.body.message;
     const threadId = ctx.request.body.threadId || 'default';
+    const actionAttributes = ctx.request.body.actionAttributes;
 
     // 查找或创建新的 thread
     let thread = threads.find(t => t.id === threadId);
@@ -85,7 +87,7 @@ router.post('/reply', async ctx => {
 
     const timestamp = Date.now(); // 添加时间戳
 
-    thread.messages.push({ sender: 'user', text: userMessage, id: messageId, timestamp });
+    thread.messages.push({ sender: 'user', text: userMessage, id: messageId, timestamp, actionAttributes });
     
     // 使用 generateReply 函数生成回复
     const replyMessage = await generateReply(userMessage, thread);

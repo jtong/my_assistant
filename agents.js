@@ -30,8 +30,11 @@ class DefaultReplyAgent extends ReplyAgent {
 
         if (userMessage === "需要按钮") {
             additionalData = {
-                button: true, // 示范布尔值，将会渲染为按钮
-                options: ["选项1", "选项2"] // 示范字符串数组，将会渲染为select
+                buttons: {
+                    '属性1': false,
+                    '属性2': false,
+                    // 添加更多属性和初始值（false 表示未激活/未选择）
+                }
             };
         }
         return {

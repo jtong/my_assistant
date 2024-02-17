@@ -36,4 +36,4 @@
 
 ## 任务
 
-我希望 给message加入text之外的数据，数据可能有boolean，可能有字符串，整体表现为一个json，而boolean会在页面上渲染为button，字符串会渲染为select。当我们点击按钮的时候，会把这个json构造出来，有个专门的属性挂在message上，text也会显示为这个json。
+我希望 button情况不只是一个button，而是button是一类，可以有多个属性，每个属性显示为一个button，点击表示将这个属性提交为true。

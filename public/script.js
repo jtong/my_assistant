@@ -12,22 +12,22 @@ document.getElementById('create-thread-btn').addEventListener('click', createThr
 
 function createThread() {
     const selectedAgent = document.getElementById('agent-select').value; // 获取选定的策略
-    fetch('/create-thread', { 
+    fetch('/create-thread', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ agent: selectedAgent }) // 包含策略在请求体中
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.threadId) {
-            window.threadId = data.threadId;
-            loadThreads();  // 加载新的线程列表
-            // 更新 URL
-            window.history.pushState({ threadId: data.threadId }, '', `?threadId=${data.threadId}`);
-        }
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.threadId) {
+                window.threadId = data.threadId;
+                loadThreads();  // 加载新的线程列表
+                // 更新 URL
+                window.history.pushState({ threadId: data.threadId }, '', `?threadId=${data.threadId}`);
+            }
+        });
 }
 
 
@@ -86,32 +86,32 @@ function loadThreads() {
             'Pragma': 'no-cache'
         }
     })
-    .then(response => response.json())
-    .then(threads => {
-        const threadList = document.getElementById('thread-list');
-        threadList.innerHTML = ''; // 清空现有的线程列表
-        threads.forEach(thread => {
-            const li = document.createElement('li');
-            li.textContent = `${thread.id} ： (${thread.messageCount} messages)`;
+        .then(response => response.json())
+        .then(threads => {
+            const threadList = document.getElementById('thread-list');
+            threadList.innerHTML = ''; // 清空现有的线程列表
+            threads.forEach(thread => {
+                const li = document.createElement('li');
+                li.textContent = `${thread.id} ： (${thread.messageCount} messages)`;
 
-            // 创建删除按钮
-            const deleteBtn = document.createElement('button');
-            deleteBtn.textContent = '删除';
-            deleteBtn.onclick = function(event) {
-                event.stopPropagation(); // 阻止事件冒泡
-                deleteThread(thread.id);
-            };
-            li.appendChild(deleteBtn);
+                // 创建删除按钮
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '删除';
+                deleteBtn.onclick = function (event) {
+                    event.stopPropagation(); // 阻止事件冒泡
+                    deleteThread(thread.id);
+                };
+                li.appendChild(deleteBtn);
 
-            li.onclick = function () {
-                window.threadId = thread.id;
-                loadMessages(thread.id);
-                // 更新 URL
-                window.history.pushState({ threadId: thread.id }, '', `?threadId=${thread.id}`);
-            };
-            threadList.appendChild(li);
+                li.onclick = function () {
+                    window.threadId = thread.id;
+                    loadMessages(thread.id);
+                    // 更新 URL
+                    window.history.pushState({ threadId: thread.id }, '', `?threadId=${thread.id}`);
+                };
+                threadList.appendChild(li);
+            });
         });
-    });
 }
 
 function deleteThread(threadId) {
@@ -148,36 +148,39 @@ function loadMessages(threadId) {
         });
 }
 
-function sendMessage() {
-    var userInput = document.getElementById('user-input').value;
-    var threadId = window.threadId || createThread(); // 确保有一个有效的线程 ID
+function sendMessage(messageContent, actionAttributes = null) {
+    const userInput = document.getElementById('user-input').value;
+    const threadId = window.threadId || createThread(); // 确保有一个有效的线程 ID
+    const messageId = 'msg_' + Math.random().toString(36).substr(2, 9);
 
-    if (userInput) {
-        // 创建一个简单的随机消息ID
-        let messageId = 'msg_' + Math.random().toString(36).substr(2, 9);
+    let messageData = {
+        message: actionAttributes ? messageContent : userInput,
+        threadId,
+        messageId,
+        // 如果存在动作属性，将其包含在发送的数据中
+        actionAttributes: actionAttributes
+    };
 
-        // 显示用户输入
-        displayUserMessage(userInput, 'user', messageId);
+    // 显示用户输入
+    displayUserMessage(messageData.message, 'user', messageId);
 
-        // 发送到后端并获取回复
-        fetch('/reply', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ message: userInput, threadId: threadId, messageId: messageId })
+    fetch('/reply', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(messageData)
+    })
+        .then(response => response.json())
+        .then(data => {
+            // 显示消息等
+            if (actionAttributes) {
+                console.log('处理动作执行事件的响应');
+            } else {
+                // 处理普通消息的逻辑
+            }
         })
-            .then(response => response.json())
-            .then(data => {
-                displayBotMessage(data.message, data.message.sender, data.message.id);
-
-                // 更新表单提交状态
-                updateFormStatus(threadId, messageId, false);
-            });
-
-        // 清空输入框
-        document.getElementById('user-input').value = '';
-    }
+        .catch(error => console.error('发送消息时出错:', error));
 }
 
 function updateFormStatus(threadId, messageId, submitted) {
@@ -188,15 +191,15 @@ function updateFormStatus(threadId, messageId, submitted) {
         },
         body: JSON.stringify({ threadId: threadId, messageId: messageId, submitted: submitted })
     })
-    .then(response => response.json())
-    .then(data => {
-        // 处理响应
-        console.log('Form status updated:', data);
-    })
-    .catch(error => {
-        // 处理错误
-        console.error('Error updating form status:', error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            // 处理响应
+            console.log('Form status updated:', data);
+        })
+        .catch(error => {
+            // 处理错误
+            console.error('Error updating form status:', error);
+        });
 }
 
 function displayUserMessage(message, sender, messageId) {
@@ -224,26 +227,18 @@ function displayBotMessage(message, sender, messageId, additionalData) {
     }
 
     // 根据additionalData渲染额外的元素
-    if (message.additionalData) {
-        if (additionalData.button) {
-            const button = document.createElement('button');
-            button.textContent = "操作";
-            button.addEventListener('click', function() {
-                // 处理按钮点击事件
-                displayJson(additionalData); // 示范函数，用于显示或处理JSON数据
+    if (additionalData && additionalData.buttons) {
+        Object.keys(additionalData.buttons).forEach(buttonName => {
+            const buttonElement = document.createElement('button');
+            buttonElement.textContent = buttonName;
+            buttonElement.addEventListener('click', function () {
+                // 构建动作属性对象
+                const actionAttributes = { [buttonName]: true };
+                // 调用 sendMessage 函数并传递动作属性
+                sendMessage(`动作执行: ${buttonName}`, actionAttributes);
             });
-            messageElement.appendChild(button);
-        }
-        if (additionalData.options) {
-            const select = document.createElement('select');
-            additionalData.options.forEach(function(option) {
-                const optionElement = document.createElement('option');
-                optionElement.value = option;
-                optionElement.textContent = option;
-                select.appendChild(optionElement);
-            });
-            messageElement.appendChild(select);
-        }
+            messageElement.appendChild(buttonElement);
+        });
     }
 
     if (messageId) {
