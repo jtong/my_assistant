@@ -230,7 +230,7 @@ function displayBotMessage(message, sender, messageId, additionalData) {
     }
 
     // 根据additionalData渲染额外的元素
-    if (additionalData && additionalData.buttons) {
+    if (additionalData && additionalData.buttons && !message.ignoreButtons) {
         Object.keys(additionalData.buttons).forEach(buttonName => {
             const buttonElement = document.createElement('button');
             buttonElement.textContent = buttonName;
