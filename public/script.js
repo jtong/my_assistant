@@ -181,7 +181,9 @@ function sendMessage(messageContent, actionAttributes = null) {
                 // 处理普通消息的逻辑
                 
             }
-            displayBotMessage(data.message, data.message.sender, data.message.id, data.message.additionalData);
+            //displayBotMessage(data.message, data.message.sender, data.message.id, data.message.additionalData);
+            loadMessages(data.message.threadId); // 在这里调用 loadMessages 函数，确保使用正确的 threadId
+
         })
         .catch(error => console.error('发送消息时出错:', error));
 }

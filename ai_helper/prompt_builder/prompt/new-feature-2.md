@@ -36,4 +36,4 @@
 
 ## 任务
 
-我希望 ignoreButtons属性为true的message，即便有additionalData，前段也不显示
+我希望 提交消息后，检查一下所有的message，如果被设置了 ignoreButtons ，立刻不显示。
