@@ -233,9 +233,21 @@ function displayBotMessage(message, sender, messageId, additionalData) {
 
     // 根据additionalData渲染额外的元素
     if (additionalData && additionalData.buttons && !message.ignoreButtons) {
+        const anyButtonClicked = Object.values(additionalData.buttons).some(value => value === true);
+
         Object.keys(additionalData.buttons).forEach(buttonName => {
             const buttonElement = document.createElement('button');
             buttonElement.textContent = buttonName;
+            // 如果有任何按钮被点击，仅显示被点击的按钮，并使其不可点击
+            if (anyButtonClicked) {
+                if (additionalData.buttons[buttonName]) {
+                    // 按钮被点击，显示并禁用
+                    buttonElement.disabled = true;
+                } else {
+                    // 隐藏未被点击的按钮
+                    return;
+                }
+            }
             buttonElement.addEventListener('click', function () {
                 // 构建动作属性对象
                 const actionAttributes = { 

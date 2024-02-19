@@ -36,4 +36,4 @@
 
 ## 任务
 
-我希望 提交消息后，检查一下所有的message，如果被设置了 ignoreButtons ，立刻不显示。
+我希望 additionalData.buttons生成的按钮被点击按钮后，仅显示点击了的按钮，且变得不可点击
