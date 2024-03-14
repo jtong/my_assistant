@@ -53,4 +53,7 @@ agentManager.registerAgent('default', new DefaultReplyAgent());
 const {GreenTeaReplyAgent} = require("green-tea");
 agentManager.registerAgent('green_tea', new GreenTeaReplyAgent());
 
+const { FormSenderReplyAgent } = require('form_sender');
+agentManager.registerAgent('form_sender', new FormSenderReplyAgent());
+
 module.exports = agentManager;

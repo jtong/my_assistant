@@ -15,10 +15,10 @@ class AgentManager {
         let agentKey = thread.agent;
 
         if (this.agents[agentKey]) {
-            return this.agents[agentKey].execute(userMessage, thread);
+            return await this.agents[agentKey].execute(userMessage, thread);
         } else {
             console.log(`No agent found for key: ${agentKey}, falling back to default.`);
-            return this.agents['default'].execute(userMessage, thread);
+            return await this.agents['default'].execute(userMessage, thread);
         }
     }
 }

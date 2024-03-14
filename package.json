@@ -16,7 +16,8 @@
     "koa-router": "^12.0.1",
     "koa-static": "^5.0.0",
     "agent-base": "git+https://github.com/jtong/agent-base.git",
-    "green-tea": "file:../green_tea"
+    "green-tea": "file:../green_tea",
+    "form_sender": "file:../form_sender"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"

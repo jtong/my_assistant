@@ -4,10 +4,10 @@ const bodyParser = require('koa-bodyparser');
 const serve = require('koa-static');
 const path = require('path');
 const fs = require('fs').promises;  // 异步文件操作
-const agentManager = require('./agents');
+const agentManager = require(path.join(__dirname, 'agents'));
 
 async function generateReply(userMessage, thread) {
-    return agentManager.executeAgent(userMessage, thread);
+    return await agentManager.executeAgent(userMessage, thread);
 }
 
 const app = new Koa();
@@ -86,6 +86,7 @@ router.post('/reply', async ctx => {
     }
 
     const timestamp = Date.now(); // 添加时间戳
+    thread.messages.push({ sender: 'user', text: userMessage, id: messageId, timestamp, actionAttributes });
 
     if (!actionAttributes) {
         // 遍历线程中的所有消息，隐藏包含按钮的消息
@@ -107,8 +108,7 @@ router.post('/reply', async ctx => {
         }
     }
 
-    thread.messages.push({ sender: 'user', text: userMessage, id: messageId, timestamp, actionAttributes });
-    
+
     // 使用 generateReply 函数生成回复
     const replyMessage = await generateReply(userMessage, thread);
 
